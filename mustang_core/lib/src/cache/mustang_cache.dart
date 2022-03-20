@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:hive/hive.dart';
 import 'package:mustang_core/src/store/mustang_store.dart';
 
@@ -22,12 +24,19 @@ class MustangCache {
     await Hive.openLazyBox(cacheName);
   }
 
+  static Future<Map<String, dynamic>?> getObject<T>(String key,
+      String modelKey,) async {
+    LazyBox lazyBox = Hive.lazyBox(cacheName);
+    Map<String, String> cacheData =
+        (await lazyBox.get(key))?.cast<String, String>() ?? {};
+    return cacheData[modelKey] == null ? null : jsonDecode(
+        cacheData[modelKey]!);
+  }
+
   /// Writes serialized object to a file
-  static Future<void> addObject(
-    String key,
-    String modelKey,
-    String modelValue,
-  ) async {
+  static Future<void> addObject(String key,
+      String modelKey,
+      String modelValue,) async {
     LazyBox lazyBox = Hive.lazyBox(cacheName);
     Map<String, String> value;
 
@@ -35,7 +44,7 @@ class MustangCache {
       value = (await lazyBox.get(key))?.cast<String, String>() ?? {};
       value.update(
         modelKey,
-        (_) => modelValue,
+            (_) => modelValue,
         ifAbsent: () => modelValue,
       );
       await lazyBox.put(key, value);
@@ -45,15 +54,13 @@ class MustangCache {
   /// Deserializes the previously serialized string into an object and
   /// - updates MustangStore
   /// - updates Persistence store
-  static Future<void> restoreObjects(
-    String key,
-    void Function(
-      void Function<T>(T t) update,
-      String modelName,
-      String jsonStr,
-    )
-        callback,
-  ) async {
+  static Future<void> restoreObjects(String key,
+      void Function(
+          void Function<T>(T t) update,
+          String modelName,
+          String jsonStr,
+          )
+      callback,) async {
     LazyBox lazyBox = Hive.lazyBox(cacheName);
     if (lazyBox.isOpen) {
       Map<String, String> cacheData =

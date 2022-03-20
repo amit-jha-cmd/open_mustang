@@ -11,6 +11,8 @@ class MustangStore {
   // HashMap is used to store objects when large flag is enabled
   static final HashMap<String, Object?> _hashStore = HashMap();
 
+  bool offline = false;
+
   static const nonNullType = 'Mustang store accepts only non-nullable types';
 
   // Flat to persist the data
