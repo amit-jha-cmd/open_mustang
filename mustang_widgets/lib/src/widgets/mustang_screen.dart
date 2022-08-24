@@ -29,7 +29,7 @@ class MustangScreen<T extends ChangeNotifier> extends StatelessWidget {
           T state = StateConsumer<T>().of(context)!;
 
           if (fetchData != null) {
-            SchedulerBinding.instance?.addPostFrameCallback(
+            SchedulerBinding.instance.addPostFrameCallback(
               (_) => fetchData!(),
             );
           }
